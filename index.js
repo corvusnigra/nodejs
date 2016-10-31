@@ -1,11 +1,21 @@
 /**
  * Created by URIY on 31.10.2016.
  */
-var express = require('express');
 
+var express = require('express');
+var fortune = require('./lib/fortune.js');
 var app = express();
-var handlebars = require('express-handlebars')
-    .create({ defaultLayout:'main' });
+
+var handlebars = require('express3-handlebars').create({
+    defaultLayout:'main',
+    helpers: {
+        section: function(name, options){
+            if(!this._sections) this._sections = {};
+            this._sections[name] = options.fn(this);
+            return null;
+        }
+    }
+});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 
@@ -16,8 +26,19 @@ app.use(express.static(__dirname + '/public'));
 app.get('/', function(req, res) {
     res.render('home');
 });
-app.get('/about', function(req, res) {
-    res.render('about');
+app.get('/about', function(req, res){
+    res.render('about', { fortune: fortune.getFortune() } );
+});
+app.get('/nursery-rhyme', function(req, res){
+    res.render('nursery-rhyme');
+});
+app.get('/data/nursery-rhyme', function(req, res){
+    res.json({
+        animal: 'бельчонок',
+        bodyPart: 'хвост',
+        adjective: 'пушистый',
+        noun: 'черт',
+    });
 });
 // Обобщенный обработчик 404 (промежуточное ПО)
 app.use(function(req, res, next){
