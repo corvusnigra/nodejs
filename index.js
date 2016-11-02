@@ -1,7 +1,7 @@
 /**
  * Created by URIY on 31.10.2016.
  */
-
+var credentials = require('./credentials.js');
 var express = require('express');
 var fortune = require('./lib/fortune.js');
 var app = express();
@@ -24,6 +24,7 @@ app.set('port',process.env.PORT || 3000);
 
 app.use(express.static(__dirname + '/public'));
 app.use(require('body-parser').urlencoded({ extended: true }));
+app.use(require('cookie-parser')(credentials.cookieSecret));
 
 app.get('/contest/vacation-photo', function(req, res){
     var now = new Date();
@@ -62,6 +63,9 @@ app.get('/', function(req, res) {
     res.render('home');
 });
 app.get('/about', function(req, res){
+    var monster = req.cookies.monster;
+    console.log(monster);
+    res.cookie('monster', 'nom nom');
     res.render('about', { fortune: fortune.getFortune() } );
 });
 app.get('/nursery-rhyme', function(req, res){
